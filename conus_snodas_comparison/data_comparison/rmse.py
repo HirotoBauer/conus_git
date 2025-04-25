@@ -7,12 +7,10 @@ from matplotlib import pyplot as plt
 
 var = "SNOWH"
 snodas_path = Path(
-    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_time_avg.nc"
+    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_99.0th_percentile.nc"
 )
 
-conus_path = Path(
-    f"C:/Users/noodl/Desktop/usa_snow/CONUS404/time_smoothed_03-22/conus_{var}_time_avg.nc"
-)
+conus_path = Path(f"C:/Users/noodl/Desktop/usa_snow/processed_data/{var}_99th_full.nc")
 
 snodas_data = xr.open_dataset(snodas_path)
 # snodas_data = snodas_data.rename({"interpolated_data_snowh": "SNOWH"})
@@ -80,7 +78,7 @@ plt.figure(figsize=(10, 8))
 plt.scatter(x, y, alpha=0.5, s=5, c="royalblue")
 
 # set font size
-SMALL_SIZE = 17
+SMALL_SIZE = 20
 MEDIUM_SIZE = 20
 BIGGER_SIZE = 25
 
@@ -96,13 +94,19 @@ plt.title(f"SNODAS vs CONUS404 {var} Data")
 plt.xlabel("SNODAS")
 plt.ylabel("CONUS404")
 
+ax_max = 6000
 ax = plt.gca()
-ax.set_xlim(0, 4000)
-ax.set_ylim(0, 4000)
+ax.set_xlim(0, ax_max)
+ax.set_ylim(0, ax_max)
 
 # add 1:1 line
 plt.plot(
-    [0, 4000], [0, 4000], color="red", linestyle="--", linewidth=1.3, label="1:1 line"
+    [0, ax_max],
+    [0, ax_max],
+    color="red",
+    linestyle="--",
+    linewidth=1.3,
+    label="1:1 line",
 )
 
 plt.show()

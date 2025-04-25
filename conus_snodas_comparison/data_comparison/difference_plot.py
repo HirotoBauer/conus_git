@@ -10,12 +10,11 @@ import matplotlib.colors as mcolors
 
 var = "SNOWH"
 snodas_path = Path(
-    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_time_avg.nc"
+    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_99.0th_percentile.nc"
 )
 
-conus_path = Path(
-    f"C:/Users/noodl/Desktop/usa_snow/CONUS404/time_smoothed_03-22/conus_{var}_time_avg.nc"
-)
+conus_path = Path(f"C:/Users/noodl/Desktop/usa_snow/processed_data/{var}_99th_full.nc")
+
 
 # make the names of the variables the same between the datasets
 # only if this has not been done already #FIXME
@@ -113,7 +112,7 @@ ax.add_feature(cfeature.STATES, linewidth=0.5)
 ax.add_feature(cfeature.COASTLINE)
 ax.set_extent([-125, -66, 24, 50], crs=ccrs.PlateCarree())
 plt.title(
-    f"CONUS404: {var} - SNODAS: {var}",
+    f"99th Percentile\nCONUS404: {var} - SNODAS: {var}",
 )
 
 plt.show()
