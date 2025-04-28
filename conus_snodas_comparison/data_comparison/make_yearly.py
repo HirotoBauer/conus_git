@@ -14,15 +14,13 @@ def take_yearly_avg(data_paths, water_year, var):
 
         # make sure the name of the dataset is corrrect
         file_name = f"snodas_{var}_{water_year}_yearly_avg.nc"
-        save_dir = Path("C:/Users/noodl/Desktop/usa_snow/yearly_avgs")
+        save_dir = Path("/kaiganJ/hiroto/python_scripts/conus_yearly/")
         yearly_avg.to_netcdf(save_dir / file_name)
 
 
-data_list = pd.read_csv(
-    Path("C:/Users/noodl/Desktop/usa_snow/file_path_lists/snodas_file_list.csv")
-)
+data_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_file_list.csv/"))
 
-var = "SNOW"
+var = "SNOWH"
 
 var_list = data_list.loc[data_list["variable"] == var]
 
