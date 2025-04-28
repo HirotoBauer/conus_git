@@ -56,46 +56,12 @@ def annual_quantiles(data_paths, var, quantile):
     yrs = yrs.chunk({"year": -1})
     final = yrs[var].quantile(quantile, dim="year")
 
-    final.to_netcdf(f"{var}_{int(quantile * 100)}th_full.nc")
+    final.to_netcdf(f"snodas_{var}_{int(quantile * 100)}th_full.nc")
 
 
-# calculates the quantile using all the files given to the function wihtout intermediates
-# cannot do the entire conus dataset as it will run out of memory
-def find_cutoff(data_paths, var, quantile):
-    dataset = "conus"
-
-    # open first file to extract the coords
-    data_paths = list(data_paths)
-    example_coords = xr.open_dataset(data_paths[0])
-    lat = example_coords["XLAT"]
-    lon = example_coords["XLONG"]
-    example_coords.close()
-
-    print(f"finding cutoff value for {quantile}th percentile of {var} data")
-
-    ds = xr.open_mfdataset(
-        data_paths,
-        combine="by_coords",
-        preprocess=drop_coords,
-        chunks={"time": 5, "lat": 100, "lon": 100},
-    )
-
-    ds = ds.assign_coords(lat=lat, lon=lon)
-    ds = ds.fillna(0).astype("float32")
-
-    ds_chunked = ds.chunk({"Time": -1})
-
-    quantile_data = ds_chunked[var].quantile(quantile, dim="Time")
-
-    quantile_data.attrs["description"] = f"{quantile * 100}th percentile across time"
-
-    encoding = {var: {"dtype": "float32", "zlib": True, "complevel": 1}}
-    quantile_data.to_netcdf(
-        f"{dataset}_{var}_{quantile * 100}th_percentile_6UTC.nc", encoding=encoding
-    )
-
-
-file_list_dir = Path("/kaiganJ/hiroto/file_list//conus_file_list.csv")
+file_list_dir = Path(
+    "C:/Users/noodl/Desktop/usa_snow/file_path_lists/snodas_file_list.csv"
+)
 
 filelist = pd.read_csv(file_list_dir)
 
@@ -117,19 +83,7 @@ if data2smooth.empty:
     raise ValueError("no data for given paramters in data2smooth")
 
 # This function computes the annual quantiles then combines them to compute the final quantile
-# annual_quantiles(data2smooth, var2smooth, 0.99)
+annual_quantiles(data2smooth, var2smooth, 0.99)
 
-# This function uses only the data at 06:00 UTC to compute the quantile
-# same as the quantile computed for SNODAS
-smooth_6UTC = filelist[
-    (filelist["date"] >= time_first)
-    & (filelist["date"] <= time_last)
-    & (filelist["variable"] == var2smooth)
-    & (filelist["date"].hour == 6)
-]
-
-if smooth_6UTC.empty:
-    raise ValueError("no data fro given parameters in smooth_6UTC")
-find_cutoff(smooth_6UTC, var2smooth, 0.99)
 
 print(f"data smoothing completed for {var2smooth}")
