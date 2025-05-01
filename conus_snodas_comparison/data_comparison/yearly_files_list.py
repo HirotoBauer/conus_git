@@ -1,11 +1,11 @@
 import pandas as pd
 from pathlib import Path
 
-base_dir = Path("C:/Users/noodl/Desktop/usa_snow/yearly_avgs/snodas")
+base_dir = Path("C:/Users/noodl/Desktop/usa_snow/yearly_avgs")
 
 path_list = base_dir.glob("*.nc")
 
-export_list = pd.DataFrame(columns=["file_path", "variable", "water_year"])
+export_list = pd.DataFrame(columns=["file_path", "variable", "water_year", "dataset"])
 
 for path in path_list:
     filename = path.name
@@ -14,8 +14,8 @@ for path in path_list:
     water_year = filename.split(sep="_")[2]
 
     row = pd.DataFrame(
-        [[path, var, water_year]],
-        columns=["file_path", "variable", "water_year"],
+        [[path, var, water_year, dataset]],
+        columns=["file_path", "variable", "water_year", "dataset"],
     )
 
     export_list = pd.concat([export_list, row], ignore_index=True)
@@ -23,5 +23,5 @@ for path in path_list:
 
 output_dir = Path("C:/Users/noodl/Desktop/usa_snow/file_path_lists")
 
-file_name = "snodas_yearly_file_list.csv"
+file_name = "yearly_file_list.csv"
 export_list.to_csv(output_dir / file_name, index=False)

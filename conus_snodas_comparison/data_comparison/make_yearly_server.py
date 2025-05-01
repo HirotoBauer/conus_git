@@ -5,22 +5,22 @@ import pandas as pd
 
 
 def take_yearly_avg(data_paths, water_year, var):
-    print(f"started smoothing data for {water_year}...", end="")
+    print(f"started smoothing data for {water_year}...")
 
     with xr.open_mfdataset(
         data_paths,
         combine="by_coords",
         chunks="auto",
     ) as ds:
-        ds = ds.chunk({"Time": 168, "south_north": "auto", "west_east": "auto"})
+        ds = ds.chunk({"Time": 168, "south_north": 100, "west_east": 100})
         try:
             yearly_avg = ds.mean(dim="Time")
-            print("Calculated Average", end=" ")
+            print("Calculated Average")
 
             yearly_avg = yearly_avg.assign_coords({"year": water_year})
             # Expand dimensions to include the year
             yearly_avg = yearly_avg.expand_dims({"year": [water_year]})
-            print("Added time dimension", end=" ")
+            print("Added time dimension")
 
         except Exception as e:
             print(f"Error occured while calculating the yearly average:\n{e}")
@@ -40,12 +40,8 @@ def take_yearly_avg(data_paths, water_year, var):
 
 
 print("Started make_yearly.py")
-# data_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
-var_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
-
-mem = var_list.memory_usage(deep=True).sum()  # bytes
-print(f"DataFrame uses {mem / 1e9:.1f} GB of RAM")
-print(var_list.dtypes)
+data_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
+# var_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
 
 var = "SNOWH"
 
@@ -55,6 +51,8 @@ var = "SNOWH"
 #     & (data_list["water_year"] <= 2022)
 # ]
 
+data_list["date"] = pd.to_datetime(data_list["date"])
+var_list = data_list.loc[(data_list["date"].dt.hour == 6)]
 
 # del data_list
 # gc.collect()
