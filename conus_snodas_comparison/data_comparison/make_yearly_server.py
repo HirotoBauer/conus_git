@@ -44,12 +44,8 @@ data_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.cs
 # var_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
 
 var = "SNOWH"
-
-# var_list = data_list.loc[
-#     (data_list["variable"] == var)
-#     & (data_list["water_year"] >= 2004)
-#     & (data_list["water_year"] <= 2022)
-# ]
+# need = [2015, 2017, 2020]
+# var_list = data_list.loc[(data_list["water_year"].isin(need))]
 
 data_list["date"] = pd.to_datetime(data_list["date"])
 var_list = data_list.loc[(data_list["date"].dt.hour == 6)]
@@ -60,9 +56,7 @@ var_list = data_list.loc[(data_list["date"].dt.hour == 6)]
 # var_list = var_list.loc[~var_list["corrupted"]]
 
 for year in var_list["water_year"].unique():
-    print("test1")
     year_files = var_list.loc[var_list["water_year"] == year]
-    print("test2")
     take_yearly_avg(year_files["file_path"].tolist(), year, var)
 
     print(f"data smoothing completed for {var} {year}")
