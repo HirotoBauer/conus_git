@@ -78,17 +78,17 @@ plt.figure(figsize=(10, 8))
 plt.scatter(x, y, alpha=0.5, s=5, c="royalblue")
 
 # set font size
-SMALL_SIZE = 20
-MEDIUM_SIZE = 20
-BIGGER_SIZE = 25
+small = 20
+medium = 20
+large = 25
 
-plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
-plt.rc("axes", titlesize=BIGGER_SIZE)  # fontsize of the axes title
-plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
-plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
-plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
-plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
-plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
+plt.rc("font", size=small)  # controls default text sizes
+plt.rc("axes", titlesize=large)  # fontsize of the axes title
+plt.rc("axes", labelsize=medium)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=small)  # fontsize of the tick labels
+plt.rc("ytick", labelsize=small)  # fontsize of the tick labels
+plt.rc("legend", fontsize=small)  # legend fontsize
+plt.rc("figure", titlesize=large)  # fontsize of the figure title
 
 plt.title(f"SNODAS vs CONUS404 {var} Data")
 plt.xlabel("SNODAS")

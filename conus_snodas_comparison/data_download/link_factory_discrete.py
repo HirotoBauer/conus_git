@@ -24,7 +24,7 @@ def url_factory(base_url, date):
 
 # read missing dates from csv
 with open(
-    "C:/Users/noodl/Desktop/usa_snow/python_scripts/random_tests/missing_dates.csv"
+    "C:/Users/noodl/Desktop/conus_git/conus_snodas_comparison/random_tests/missing_dates.csv"
 ) as f:
     reader = csv.reader(f)
     missing_dates = [row[0] for row in reader]
