@@ -25,11 +25,11 @@ def take_avg(data_paths, year, month, var):
             print("Added time dimension")
 
         except Exception as e:
-            print(f"Error occured while calculating the yearly average:\n{e}")
+            print(f"Error occured while calculating the monthly average:\n{e}")
             raise
 
         # make sure the name of the dataset is corrrect
-        file_name = f"conus_{var}_{year}_{month}_yearly_avg.nc"
+        file_name = f"conus_{var}_{year}_{month}_monthly_avg.nc"
         save_dir = Path("/kaiganJ/hiroto/conus_monthly/")
         save_dir.mkdir(parents=True, exist_ok=True)
         encoding = {var: {"zlib": True, "complevel": 4, "chunksizes": (1, 500, 500)}}
@@ -41,7 +41,7 @@ def take_avg(data_paths, year, month, var):
             raise
 
 
-print("Started make_yearly.py")
+print("Started make_monthly.py")
 data_list = pd.read_csv(Path("/kaiganJ/hiroto/CONUS/urgent/conus_file_list.csv"))
 # var_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
 
@@ -62,8 +62,8 @@ gc.collect()
 for v in var:
     vfiles = var_list.loc[var_list["variable"] == v]
     for year in var_list["water_year"].unique():
-        year_files = vfiles.loc[var_list["water_year"] == year]
-        for month in year_files["month"].unique:
+        year_files = vfiles.loc[vfiles["water_year"] == year]
+        for month in year_files["month"].unique():
             paths = year_files.loc[year_files["month"] == month, "file_path"].tolist()
             take_avg(paths, year, month, v)
             print(f"data smoothing completed for {v} {year}")

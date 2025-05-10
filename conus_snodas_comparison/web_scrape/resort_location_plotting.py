@@ -1,13 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
-from matplotlib import cm
-import matplotlib.colors as mcolors
 import cartopy.feature as cfeature
 
 # Load data
 data = pd.read_csv(
-    "resort_data_coords_altitude_terrain.csv", usecols=["lat", "lon", "altitude"]
+    "resort_data_coords_altitude_terrain_contUS.csv", usecols=["lat", "lon", "altitude"]
 )
 
 cmap = "copper"
