@@ -15,13 +15,17 @@ def take_avg(data_paths, year, month, var):
         chunks="auto",
     ) as ds:
         ds = ds.chunk({"Time": 168, "south_north": 100, "west_east": 100})
+
         try:
-            avg = ds.mean(dim="Time")
+            avg = ds.mean(dim="Time").load()
             print("Calculated Average")
 
-            avg = avg.assign_coords({"water_year": year, "month": month})
+            for dim in ["month", "water_year"]:
+                if dim in avg.dims:
+                    avg = avg.drop_dims(dim)
+
             # Expand dimensions to include the year and month
-            avg = avg.expand_dims({"water_year": [year], "month": month})
+            avg = avg.expand_dims({"water_year": [year], "month": [month]})
             print("Added time dimension")
 
         except Exception as e:
@@ -29,16 +33,18 @@ def take_avg(data_paths, year, month, var):
             raise
 
         # make sure the name of the dataset is corrrect
-        file_name = f"conus_{var}_{year}_{month}_monthly_avg.nc"
+        file_name = f"conus_{var}_{year}_{month:02d}_monthly_avg.nc"
         save_dir = Path("/kaiganJ/hiroto/conus_monthly/")
         save_dir.mkdir(parents=True, exist_ok=True)
-        encoding = {var: {"zlib": True, "complevel": 4, "chunksizes": (1, 500, 500)}}
+        # encoding = {var: {"zlib": True, "complevel": 4, "chunksizes": (1, 500, 500)}}
         try:
-            avg.to_netcdf(save_dir / file_name, encoding=encoding)
+            avg.to_netcdf(save_dir / file_name)
             print("Saved!")
         except Exception as e:
             print(f"An error has occured while saving:\n{e}")
             raise
+        del avg, ds
+        gc.collect()
 
 
 print("Started make_monthly.py")
@@ -46,7 +52,7 @@ data_list = pd.read_csv(Path("/kaiganJ/hiroto/CONUS/urgent/conus_file_list.csv")
 # var_list = pd.read_csv(Path("/kaiganJ/hiroto/file_list/conus_list_comparison.csv"))
 
 var = ["SNOWH", "SNOW"]
-need = [2005, 1985]
+need = [2015]
 var_list = data_list.loc[(data_list["water_year"].isin(need))]
 var_list = var_list.loc[(data_list["variable"].isin(var))]
 var_list["date"] = pd.to_datetime(var_list["date"])

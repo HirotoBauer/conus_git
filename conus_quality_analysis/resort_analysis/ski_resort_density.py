@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.spatial import cKDTree
 
+# TODO make a check that ensures that ski resorts with no close points are not included
+
 
 def build_idw_interpolator(da, power, var="rho"):
     """
@@ -19,8 +21,11 @@ def build_idw_interpolator(da, power, var="rho"):
     # creates an array with format (lat,lon)
     pts = np.column_stack([lats.ravel(), lons.ravel()])
 
-    # Build KDTree
-    tree = cKDTree(pts)
+    valid = np.isfinite(vals.ravel())
+    pts_valid = pts[valid]
+    tree = cKDTree(pts_valid)
+
+    # print(np.count_nonzero(np.isnan(pts_valid)))
 
     def interp(lat0, lon0, k):
         """
@@ -28,13 +33,19 @@ def build_idw_interpolator(da, power, var="rho"):
         Returns a single scalar.
         """
         # Query the k nearest neighbors
-        dists, idxs = tree.query([lon0, lat0], k=k)
+        dists, idxs = tree.query([lat0, lon0], k=k)
         # ensures that the outputs are arrays of 1D even if k=1
         dists = np.atleast_1d(dists)
         idxs = np.atleast_1d(idxs)
 
+        # ensures that there are points close by
+        if np.max(dists) > 0.1:  # about 11 km
+            return np.nan
+        # print(dists, idxs)
+
         # Get the neighbor values
-        neigh_vals = vals.ravel()[idxs]
+        vals_valid = vals.ravel()[valid]
+        neigh_vals = vals_valid[idxs]
 
         # If any distance is zero, return that neighbor’s value directly
         if np.any(dists == 0):
@@ -46,6 +57,7 @@ def build_idw_interpolator(da, power, var="rho"):
 
         return np.sum(weights * neigh_vals)
 
+    # print(interp)
     return interp
 
 
@@ -65,17 +77,20 @@ resorts["east_west"] = pd.cut(resorts["lon"], bins=lon_bins, labels=bin_names)
 
 # extract values for snow density at ski resort locations
 # by averaging 3 closest values for each time monthly average
-density_filelist = pd.read_csv("density_monthly_file_list.csv")  # TODO check this
-density_filelist["month"] = density_filelist["month"].astype(str).str.zfill(2)
-density_filelist["year"] = density_filelist["year"].astype(str)
-density_filelist["year-month"] = (
-    density_filelist["year"] + "-" + density_filelist["month"]
+densitylist_dir = Path(
+    "C:/Users/noodl/Desktop/usa_snow/file_path_lists/monthly_file_list.csv"
 )
+density_filelist = pd.read_csv(densitylist_dir)
+density_filelist["month"] = density_filelist["month"].astype(str).str.zfill(2)
+density_filelist["water_year"] = density_filelist["water_year"].astype(str)
+density_filelist["year-month"] = (
+    density_filelist["water_year"] + "-" + density_filelist["month"]
+)
+density_filelist = density_filelist.loc[density_filelist["variable"] == "density"]
 
 # apply inverse distance interpolation for the closes 3 datapoints to each resort
 # this is to avoid outliers and account for ski resort area
 
-# TODO check this
 k = 3  # take 3 nearest
 power = 2
 for idx, frow in density_filelist.iterrows():
@@ -89,5 +104,7 @@ for idx, frow in density_filelist.iterrows():
     # create new column for every year-month calculated
     colname = frow["year-month"]
     resorts[colname] = vals_at_resorts.values
+    print(f"{colname}: {vals_at_resorts.head()}")
 
+print(resorts.iloc[:, -5:])  # last 5 months
 resorts.to_csv("resort_density_monthly.csv", index=False)

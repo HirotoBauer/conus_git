@@ -22,11 +22,12 @@ varlist = ["SNOW", "SNOWH"]
 # extract paths for snowh and swe for each month in the year
 # pairing files for calculation
 def make_pairs(df):
+    print(df.head)
     df2 = df.reset_index().rename(columns={"index": "orig_idx"})
     pairs = (
-        df2.merge(df2, on=["year", "month"], suffixes=("_swe", "_snowh"))
-        .query("var_swe=='SNOW' and var_snowh=='SNOWH'")
-        .loc[:, ["orig_idx_swe", "orig_idx_snowh", "year", "month"]]
+        df2.merge(df2, on=["water_year", "month"], suffixes=("_swe", "_snowh"))
+        .query("variable_swe=='SNOW' and variable_snowh=='SNOWH'")
+        .loc[:, ["orig_idx_swe", "orig_idx_snowh", "water_year", "month"]]
     )
     return pairs
 
@@ -41,7 +42,7 @@ outdir = Path("/kaiganJ/hiroto/conus_monthly/")
 for _, row in pairs.iterrows():
     swe_path = df.at[row.orig_idx_swe, "file_path"]
     snowh_path = df.at[row.orig_idx_snowh, "file_path"]
-    year, month = int(row.year), int(row.month)
+    year, month = int(row.water_year), int(row.month)
 
     # open datasets
     ds_swe = xr.open_dataset(swe_path)
@@ -60,6 +61,6 @@ for _, row in pairs.iterrows():
     density["XLONG"] = ds_swe["XLONG"]
 
     # save
-    fname = outdir / f"conus_density_{year:04d}{month:02d}.nc"
+    fname = outdir / f"conus_density_{year:04d}_{month:02d}.nc"
     density.to_netcdf(fname)
     print(f"Saved {fname}")
