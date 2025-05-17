@@ -7,7 +7,7 @@ import matplotlib.colors as mcolors
 
 # Load data
 data = pd.read_csv(
-    "C:/Users/noodl/Desktop/conus_git/conus_quality_analysis/resort_analysis/resort_density_monthly.csv"
+    "C:/Users/noodl/Desktop/conus_git/conus_quality_analysis/resort_analysis/resort_snow_ratio_monthly.csv"
 )
 
 data["region"] = data["north_south"] + "_" + data["east_west"]
@@ -47,7 +47,7 @@ plot_size = (12, 4)
 plot_bounds = [-127, -65, 27, 50]  # fit to the continental us
 
 # Discrete color map
-cmap_norm = 250
+cmap_norm = 16
 levels = np.linspace(-1 * cmap_norm, cmap_norm, 25)
 n_levels = len(levels) - 1
 
@@ -88,11 +88,11 @@ for m in diff_cols:
     )
 
     cbar = plt.colorbar(location_plot, orientation="vertical", pad=0.01)
-    cbar.set_label("Bulk Density Difference (Kg/m^3)")
+    cbar.set_label("Snow Ratio Difference")
 
     ax.set_extent(plot_bounds, crs=transform)
     month_name = m.split("_")[1]
-    plt.title(f"Bulk Density Difference 2015 - 1985 for {m_dict[month_name]}")
+    plt.title(f"Snow Ratio Difference 2015 - 1985 for {m_dict[month_name]}")
 
     plt.show()
 
@@ -110,15 +110,15 @@ small = 18
 med = 22
 large = 24
 for month in regional_means.columns:
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
     regional_means[month].plot(kind="bar", ax=ax, color="royalblue")
-    ax.set_title(f"Mean Density Difference in {month} (2015 - 1985)", fontsize=large)
-    ax.set_ylabel("Δ Density", fontsize=small)
+    ax.set_title(f"Mean Snow Ratio Difference in {month} (2015 - 1985)", fontsize=large)
+    ax.set_ylabel("Δ Snow Ratio", fontsize=small)
     # ax.set_xlabel("Region", fontsize=small)
     ax.set_xlabel(None)
     ax.tick_params(axis="x", rotation=-45, labelsize=14)
     ax.tick_params(axis="y", labelsize=14)
-    ax.set_ylim(bottom=-150, top=110)
+    ax.set_ylim(bottom=-13, top=10)
     fig.tight_layout()
     ax.grid()
     plt.show()
