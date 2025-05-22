@@ -52,7 +52,7 @@ levels = np.linspace(-1 * cmap_norm, cmap_norm, 25)
 n_levels = len(levels) - 1
 
 # Create a discrete colormap and normalization
-cmap = plt.get_cmap("seismic", n_levels)  # discrete colormap
+cmap = plt.get_cmap("seismic_r", n_levels)  # discrete colormap
 
 colors = cmap(np.arange(cmap.N))
 

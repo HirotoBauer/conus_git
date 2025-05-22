@@ -10,14 +10,13 @@ import matplotlib.colors as mcolors
 
 var = "SNOWH"
 snodas_path = Path(
-    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_99.0th_percentile.nc"
+    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_time_avg.nc"
 )
 
-conus_path = Path(f"C:/Users/noodl/Desktop/usa_snow/processed_data/{var}_99th_full.nc")
+conus_path = Path("D:/CONUS404/comparison/conus_SNOWH_time_avg.nc")
 
 
 # make the names of the variables the same between the datasets
-# only if this has not been done already #FIXME
 snodas_data = xr.open_dataset(snodas_path)
 try:
     snodas_data = snodas_data.squeeze("time", drop=True)
@@ -56,24 +55,27 @@ trimmed_difference = difference.where(contiguous_mask)
 # Define discrete levels for the colorbar
 # cmap_norm = max(abs(np.nanmin(trimmed_difference.values)), abs(np.nanmax(trimmed_difference.values)))
 cmap_norm = 500
-levels = np.linspace(-1 * cmap_norm, cmap_norm, 14)
+# levels = np.linspace(-1 * cmap_norm, cmap_norm, 14)
+levels = [-500, -200, -100, -50, -5, 5, 50, 100, 200, 500]
 n_levels = len(levels) - 1
 
 # Create a discrete colormap and normalization
 cmap = plt.get_cmap("seismic", n_levels)  # discrete colormap
 
-colors = cmap(np.arange(cmap.N))
+colors = cmap(np.arange(cmap.N)).copy()
 
 # setting white to middle of color map
+white_range = 3
 norm = mcolors.Normalize(vmin=-cmap_norm, vmax=cmap_norm)
-lower_idx = int(norm(-10) * cmap.N)
-upper_idx = int(norm(10) * cmap.N)
-colors[lower_idx:upper_idx]
+lower_idx = int(norm(-white_range) * cmap.N)
+upper_idx = int(norm(white_range) * cmap.N)
+
+colors[lower_idx:upper_idx] = [1, 1, 1, 1]  # sets the color
 
 white_seismic = mcolors.ListedColormap(colors)
 norm = mcolors.BoundaryNorm(boundaries=levels, ncolors=white_seismic.N)
 
-norm = mcolors.BoundaryNorm(boundaries=levels, ncolors=cmap.N)
+# norm = mcolors.BoundaryNorm(boundaries=levels, ncolors=cmap.N)
 
 plt.figure(figsize=(12, 6))
 ax = plt.axes(projection=ccrs.PlateCarree())
@@ -99,12 +101,19 @@ mesh = ax.pcolormesh(
     trimmed_difference.lon,
     trimmed_difference.lat,
     trimmed_difference,
-    cmap=cmap,
+    cmap=white_seismic,
     norm=norm,
     transform=ccrs.PlateCarree(),
 )
 
-cbar = plt.colorbar(mesh, orientation="vertical", pad=0.02, aspect=30, ticks=levels)
+cbar = plt.colorbar(
+    mesh,
+    orientation="vertical",
+    pad=0.02,
+    aspect=30,
+    ticks=levels,
+    spacing="proportional",
+)
 cbar.set_label("Snow Depth Difference (mm)")
 
 ax.add_feature(cfeature.BORDERS, edgecolor="black")
@@ -112,7 +121,8 @@ ax.add_feature(cfeature.STATES, linewidth=0.5)
 ax.add_feature(cfeature.COASTLINE)
 ax.set_extent([-125, -66, 24, 50], crs=ccrs.PlateCarree())
 plt.title(
-    f"99th Percentile\nCONUS404: {var} - SNODAS: {var}",
+    # f"99th Percentile\nCONUS404: {var} - SNODAS: {var}"
+    f"Time Averaged\nCONUS404: {var} - SNODAS: {var}"
 )
 
 plt.show()

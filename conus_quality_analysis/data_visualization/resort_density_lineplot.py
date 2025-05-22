@@ -3,9 +3,24 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 # Load data
+# bulk snow density
+# data = pd.read_csv(
+#     "C:/Users/noodl/Desktop/conus_git/conus_quality_analysis/resort_analysis/resort_density_monthly.csv"
+# )
+
+# new snow density
 data = pd.read_csv(
-    "C:/Users/noodl/Desktop/conus_git/conus_quality_analysis/resort_analysis/resort_density_monthly.csv"
+    "C:/Users/noodl/Desktop/conus_git/conus_quality_analysis/resort_analysis/resort_snow_ratio_monthly.csv"
 )
+
+ylim = (0, 17)  # change based on the data being plotted
+
+color_dict = {
+    "lightred": "lightcoral",
+    "darkyellow": "sienna",
+    "lightyellow": "orange",
+    "lightblue": "darkturquoise",
+}
 
 data["region"] = data["north_south"] + "_" + data["east_west"]
 date_cols = [col for col in data.columns if "-" in col and col.count("-") == 1]
@@ -93,8 +108,8 @@ ax.set_xticklabels(month_labels, fontsize=xsmall)
 ax.tick_params(axis="y", labelsize=xsmall)
 ax.set_xlabel("Month", fontsize=small)
 ax.set_ylabel("Mean Snow Density [kg/m^3]", fontsize=small)
-ax.set_title("Monthly Mean Snow Density by Region and Water Year", fontsize=med)
-ax.set_ylim(100, 400)
+ax.set_title("Monthly Mean Bulk Snow Density by Region and Water Year", fontsize=med)
+ax.set_ylim(ylim)
 ax.grid(True, alpha=0.4)
 
 # Improve legend
@@ -123,9 +138,11 @@ for r in data["east_west"].unique():
         # Adjust brightness based on north/south
         if region.startswith("north"):
             color = adjust_brightness(base_color, 0.6)  # Darker
+            # color = "sienna"
             marker = "o"
         else:
-            color = adjust_brightness(base_color, 3)  # Lighter
+            # color = adjust_brightness(base_color, 20)  # Lighter
+            color = color_dict["lightblue"]
             marker = "o"
 
         df_region = means_df[[region, "month", "water_year"]].copy()
@@ -154,7 +171,7 @@ for r in data["east_west"].unique():
     ax.set_xlabel("Month", fontsize=small)
     ax.set_ylabel("Mean Snow Density [kg/m^3]", fontsize=small)
     ax.set_title(f"Monthly Mean Snow Density for {r} Region", fontsize=med)
-    ax.set_ylim(100, 400)
+    ax.set_ylim(ylim)
     ax.grid(True, alpha=0.4)
 
     # Improve legend

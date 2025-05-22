@@ -6,11 +6,17 @@ import regionmask
 from matplotlib import pyplot as plt
 
 var = "SNOWH"
+# snodas_path = Path(
+#     f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_99.0th_percentile.nc"
+# )
+
+# conus_path = Path(f"D:/CONUS404/comparison/{var}_99th_full.nc")
+
 snodas_path = Path(
-    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_99.0th_percentile.nc"
+    f"C:/Users/noodl/Desktop/usa_snow/SNODAS/time_smoothed_03-22/snodas_{var}_time_avg.nc"
 )
 
-conus_path = Path(f"C:/Users/noodl/Desktop/usa_snow/processed_data/{var}_99th_full.nc")
+conus_path = Path("D:/CONUS404/comparison/conus_SNOWH_time_avg.nc")
 
 snodas_data = xr.open_dataset(snodas_path)
 # snodas_data = snodas_data.rename({"interpolated_data_snowh": "SNOWH"})
@@ -90,11 +96,11 @@ plt.rc("ytick", labelsize=small)  # fontsize of the tick labels
 plt.rc("legend", fontsize=small)  # legend fontsize
 plt.rc("figure", titlesize=large)  # fontsize of the figure title
 
-plt.title(f"SNODAS vs CONUS404 {var} Data")
+plt.title(f"SNODAS vs CONUS404 {var} Data: Time Avg")
 plt.xlabel("SNODAS")
 plt.ylabel("CONUS404")
 
-ax_max = 6000
+ax_max = 4000
 ax = plt.gca()
 ax.set_xlim(0, ax_max)
 ax.set_ylim(0, ax_max)
