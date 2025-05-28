@@ -3,7 +3,7 @@ from pathlib import Path
 import datetime
 import csv
 
-list_dir = Path("C:/Users/noodl/Desktop/Delete/conus_file_list.csv")
+list_dir = Path("/kaiganJ/hiroto/file_list/conus_file_list.csv")
 
 filelist = pd.read_csv(list_dir)
 
@@ -12,23 +12,24 @@ time_last = datetime.datetime(2022, 9, 30, 23)
 
 filelist["date"] = pd.to_datetime(filelist["date"])
 
-first_date = filelist.loc[filelist["variable"] == "SNOWH"]["date"].min()
-last_date = filelist.loc[filelist["variable"] == "SNOWH"]["date"].max()
-# check for duplicates
-duplicate_mask = filelist.duplicated(subset=["date", "variable"], keep="last")
-
-data2delete = filelist[duplicate_mask].copy()
-
-data2delete.to_csv("data2delete.csv", index=False)
-
-
 # check for missing dates
 expected_times = pd.date_range(start=time_first, end=time_last, freq="H")
 # variables = filelist["variable"].unique()
-variables = ["SNOWH"]
+variables = ["SNOWH", "TK", "SNOW"]
 missing_dates = []
 
 for var in variables:
+    # duplicate check
+    first_date = filelist.loc[filelist["variable"] == var]["date"].min()
+    last_date = filelist.loc[filelist["variable"] == var]["date"].max()
+    # check for duplicates
+    duplicate_mask = filelist.duplicated(subset=["date", "variable"], keep="last")
+
+    data2delete = filelist[duplicate_mask].copy()
+
+    data2delete.to_csv("data2delete.csv", index=False)
+
+    # missing dates check
     var_times = filelist[filelist["variable"] == var]["date"]
     missing = expected_times.difference(var_times)
     if not missing.empty:
@@ -55,5 +56,5 @@ with open("missing_dates.csv", "w", newline="") as f:
 
 print(len(missing_dates_list))
 
-snow_only = filelist.loc[filelist["variable"] == "SNOW"]
-snow_only = snow_only.sort_values("date")
+# snow_only = filelist.loc[filelist["variable"] == "SNOW"]
+# snow_only = snow_only.sort_values("date")
